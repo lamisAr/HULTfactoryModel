@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Our industry's model</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  
+    <script src="js/extended-wasd-controls.js"></script>
+  
+  <style>
+  
+  body
+  {
+    /* disable long press in iOS? */
+    -webkit-touch-callout: none;
+  }
+  
+  .mainUI
+  {
+    border: 0px solid pink; 
+    position: fixed; 
+    top: 0px;  
+    width:99%; 
+    height:99%; 
+    z-index: 1; 
+    pointer-events: none; /* allow click-through in transparent areas */
+  }
+  
+  .regionUI
+  {
+    border: 0px solid yellow;
+    position: absolute; 
+    display: flex;
+    flex-direction: row;
+    pointer-events: none;
+  }
+  
+  .buttonUI
+  {
+    border: 0px solid lime;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    pointer-events: auto;	
+    filter: drop-shadow(0px 0px 20px white);
+  }
+  
+  .skyColor
+  {
+    filter: hue-rotate(240deg) saturate(100%) brightness(100%) drop-shadow(0px 0px 20px white);
+  }
+  
+  .baseColor
+  {
+    filter: hue-rotate(24deg) saturate(68%) brightness(100%) drop-shadow(0px 0px 20px white);
+  }
+  
+  .grayColor
+  {
+    filter: hue-rotate(0deg) saturate(0%) brightness(100%) drop-shadow(0px 0px 20px white);
+  }
+  
+  </style>
+  
+  
+</head>
+<body >
+
+  <div class="mainUI" id="uiDiv" oncontextmenu="return false;">
+
+    <!-- bottom-right -->
+    <div class="regionUI baseColor" style="bottom: 10px; right: 10px;">
+      <div class="buttonUI">
+          <img src="images/buttons/red/left.png" id="buttonMoveLeft" />
+        </div>
+        <div class="buttonUI">
+          <img src="images/buttons/red/up.png" id="buttonMoveForward" /><br/>
+          <img src="images/buttons/red/down.png" id="buttonMoveBackward" />
+        </div>
+        <div class="buttonUI">
+          <img src="images/buttons/red/right.png" id="buttonMoveRight" />
+        </div>
+    </div>
+  
+  </div>
+  
+  <script>
+  
+    function haltEvent(event)
+    {
+      event.preventDefault && event.preventDefault();
+      event.stopPropagation && event.stopPropagation();
+      event.cancelBubble = true;
+      event.returnValue = false;
+      return false;
+    }
+  
+    // prevent right-click menus from appearing
+    document.addEventListener("contextmenu", haltEvent );
+    // more attempts to prevent right-click menus from appearing -- avoid; they block touchscreen/iPad controls
+    // document.addEventListener("touchmove", haltEvent );
+    // document.addEventListener("touchcancel", haltEvent );
+    
+    // add events for both touch and mouse controls
+    function addButtonEventListeners( buttonElementID, startFunction, endFunction )
+    {
+      let element = document.getElementById( buttonElementID );
+      element.addEventListener('touchstart', startFunction);
+      element.addEventListener('mousedown',  startFunction);
+      element.addEventListener('touchend',   endFunction);
+      element.addEventListener('mouseup',    endFunction);
+    }
+  
+    function associateMovementControls( buttonElementID, component, keyName )
+    {
+      addButtonEventListeners(buttonElementID,
+        function(event) 
+        { 
+          component.registerKeyDown( keyName );
+          return haltEvent(event);
+        },
+        function(event) 
+        { 
+          component.registerKeyUp( keyName );
+          return haltEvent(event);
+        }
+      );
+    }
+  
+    // need to run javascript code after a-scene entities and components are loaded
+    AFRAME.registerComponent('screen-controls', 
+    {
+      init: function () 
+      {
+          let component = document.getElementById("camera").components["extended-wasd-controls"];
+  
+        associateMovementControls( "buttonMoveForward",  component, component.data.moveForwardKey );
+        associateMovementControls( "buttonMoveBackward", component, component.data.moveBackwardKey );
+        associateMovementControls( "buttonMoveLeft",     component, component.data.moveLeftKey );
+        associateMovementControls( "buttonMoveRight",    component, component.data.moveRightKey );
+        },
+  
+        tick: function(time, deltaTime)
+        {
+    
+        }
+    });
+  
+  
+  </script>
+
+    <a-scene 
+    
+    keyboard-shortcuts="enterVR: false;" 
+    vr-mode-ui="enabled: false;"
+    screen-controls>
+
+    <a-assets>
+      <a-asset-item id="model" src="https://cdn.glitch.global/af00b3fe-4a1b-4792-85a5-9593043ee6d1/Cool%20Crift%20(5).glb?v=1650929800271"></a-asset-item>
+        <a-asset-item id="pond" src = "opond.gltf"></a-asset-item>
+        <a-asset-item id = "factory" src="factory_building/scene.gltf"></a-asset-item>
+        <a-asset-item id="reactor" src = "algae_to_h2_factory/scene.gltf"></a-asset-item>
+        <a-asset-item id="harvestor" src = "h/h/harvestor.gltf"></a-asset-item>
+    </a-assets>
+    
+    <a-entity id="camera" camera look-controls wasd-controls="acceleration:200"
+    extended-wasd-controls="flyEnabled: true;"
+		position="50 1.6 -70"
+   
+		>
+	</a-entity>
+
+  
+  <a-entity
+  gltf-model="#factory"
+  shadow="cast"
+  scale=" 0.02 0.02 0.02"
+  position="55 -0.2 0"
+  rotation="0 90 0"
+  
+>
+
+</a-entity>
+<a-entity
+gltf-model="#harvestor"
+shadow="cast"
+scale=" 1.5 1.5 1.5"
+position="60 0.3 10"
+rotation="0 0 0"
+
+>
+
+</a-entity>
+
+<a-entity
+gltf-model="#harvestor"
+shadow="cast"
+scale=" 1.5 1.5 1.5"
+position="50 0.3 10"
+rotation="0 180 0"
+
+>
+
+</a-entity>
+
+<a-entity
+gltf-model="#harvestor"
+shadow="cast"
+scale=" 1.5 1.5 1.5"
+position="60 0.3 -5"
+rotation="0 0 0"
+
+>
+
+</a-entity>
+
+<a-entity
+gltf-model="#harvestor"
+shadow="cast"
+scale=" 1.5 1.5 1.5"
+position="50 0.3 -5"
+rotation="0 180 0"
+
+>
+
+</a-entity>
+
+
+<a-entity
+gltf-model="#reactor"
+position = "115 0.3 -15 "
+scale = "0.8 0.8 0.8"
+rotation ="0 180  0"
+
+></a-entity>
+
+  <a-cylinder radius="130" height="0.05" position="-90 0 -50" material = "src: water.jpg; repeat: 10 10 ; " rotation="0 0 0"></a-cylinder>
+ 
+<a-entity position ="0 0.1 -10">
+
+
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 45  0 -20" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 45  0 -25" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 45  0 -15" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 45  0 -30" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 45  0 -35" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 60  0 -20" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 60  0 -25" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 60  0 -30" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 60  0 -35" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+  <a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 60  0 -15" shadow="cast">
+    <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+    animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+    animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+    animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+    animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+    animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+    animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+    animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+    animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+  
+
+
+  <a-entity position="0.1 0 0"> 
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+  <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  
+   <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+    <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+  </a-entity></a-entity>
+</a-entity> 
+
+<a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 75  0.1 -30" shadow="cast">
+  <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+  animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+  animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+  animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+  animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+  animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+  animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+  animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+  animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+
+
+
+<a-entity position="0.1 0 0"> 
+<a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+<a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+ <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+</a-entity></a-entity>
+<a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 75 0.1 -35" shadow="cast">
+  <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+  animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+  animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+  animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+  animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+  animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+  animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+  animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+  animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+
+
+
+<a-entity position="0.1 0 0"> 
+<a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+<a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+ <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+</a-entity></a-entity>
+<a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 75 0.1 -40" shadow="cast">
+  <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+  animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+  animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+  animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+  animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+  animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+  animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+  animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+  animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+
+
+
+<a-entity position="0.1 0 0"> 
+<a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+<a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+ <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+</a-entity></a-entity>
+<a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 75  0.1 -45" shadow="cast">
+  <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+  animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+  animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+  animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+  animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+  animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+  animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+  animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+  animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+
+
+
+<a-entity position="0.1 0 0"> 
+<a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+<a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+ <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+</a-entity></a-entity>
+<a-entity gltf-model="#pond" scale="1.5 1.5 1.5" position=" 75  0.1 -25" shadow="cast">
+  <a-entity  id ="arrow1" position = "-1.7 0.2 0.4" rotation = "0 0 0"
+  animation__1="property:position; from: -1.7 0.2 0.4; to: 3.5 0.2 0.4; dur: 8000;startEvents: loaded, animationcomplete__8 "
+  animation__2="property:rotation; from: 0 180 0; to: 0 270 0; dur:200 ;startEvents: loaded, animationcomplete__1"     
+  animation__3="property:position; from: 3.5 0.2 0.4; to: 3.5 0.2 -0.4; dur: 1000; startEvents: loaded, animationcomplete__2"
+  animation__4="property:rotation; from: 0 270 0; to: 0 360 0; dur:200 ;startEvents: loaded, animationcomplete__3" 
+  animation__5="property:position; from: 3.5 0.2 -0.4; to: -1.7 0.2 -0.4; dur: 8000;startEvents: loaded, animationcomplete__4 ;"
+  animation__6="property:rotation; from: 0 0 0; to: 0 90 0; dur:200 ;startEvents: loaded, animationcomplete__5" 
+  animation__7="property:position; from: -1.7 0.2 -0.4; to: -1.7 0.2 0.4; dur: 1000; startEvents: loaded, animationcomplete__6"
+  animation__8="property:rotation; from: 0 90 0; to: 0 180 0; dur:200 ;startEvents: loaded, animationcomplete__7"        >
+
+
+
+<a-entity position="0.1 0 0"> 
+<a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+<a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 -0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+
+ <a-cylinder color="green" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.15"><a-cone color="green" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder>
+  <a-cylinder color="#4bbf91" rotation= "0 0 90" height="0.2" radius="0.05"  segments-radial="4" position="0 0 0.3"><a-cone color="#4bbf91" scale="0.1 0.1 0.1" position="0 0.1 0" segments-radial="4"></a-cone></a-cylinder></a-entity>
+</a-entity></a-entity>
+ 
+    <a-sky material ="src:sky.jpg"></a-sky>
+    <a-plane shadow= "receive" material="src:grass.jpg; repeat:100 100; normal-map: grass-nm.png; normal-texture-repeat:1 1" rotation="-90 0 0" width="1000" height ="1000" color="#839009" ></a-plane>
+    </a-scene>
+</body>
+</html>

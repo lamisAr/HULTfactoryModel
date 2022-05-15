@@ -1,0 +1,11 @@
+Model Information:
+* title:	Algae To H2 Factory
+* source:	https://sketchfab.com/3d-models/algae-to-h2-factory-80482fcd3fcf420dbffcf6ceb7998f1f
+* author:	stef.clevers (https://sketchfab.com/stef.clevers)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Algae To H2 Factory" (https://sketchfab.com/3d-models/algae-to-h2-factory-80482fcd3fcf420dbffcf6ceb7998f1f) by stef.clevers (https://sketchfab.com/stef.clevers) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
